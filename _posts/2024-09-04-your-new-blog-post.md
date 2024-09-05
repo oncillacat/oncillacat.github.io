@@ -21,7 +21,7 @@ Click here to download R4.1.1 for Windows:
 
 https://cloud.r-project.org/bin/windows/base/R-4.4.1-win.exe
 
-##What is R studio:
+## What is R studio:
 
 ![image](https://github.com/user-attachments/assets/0d67930e-bb58-4d58-b0ed-35c78cf0e763)
 
