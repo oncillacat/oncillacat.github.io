@@ -1,4 +1,4 @@
-##Hey, this is a class note for EPIB613
+## Hey, this is a class note for EPIB613
 
 Hello, following classmates. These are my notes for fall 2024 EPIB 613: Introduction to Statistical Software. So something about me before the whole blog starts: You can call me Jen, a first-year Master majoring in public health. I dealt with R for 2 years as a Data Analyst in the lab.
 
@@ -23,7 +23,7 @@ https://cloud.r-project.org/bin/windows/base/R-4.4.1-win.exe
 
 ##What is R studio:
 
-![image](https://github.com/user-attachments/assets/94d74c99-288d-4812-95ab-edb05ef78cf6)
+![image](https://github.com/user-attachments/assets/0d67930e-bb58-4d58-b0ed-35c78cf0e763)
 
 R studio is a UI system for R. If you play a video game, basically, the UI system makes things easier for players. It listed out 4 major part:
 
