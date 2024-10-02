@@ -43,8 +43,10 @@ Let us use scratch block to repeat this If loop again
 <img width="527" alt="Screenshot 2024-10-01 at 10 35 57 PM" src="https://github.com/user-attachments/assets/eb541a96-077c-46b7-9f18-801737f2416f">
 
 the operation result is as follow:
-![ScreenRecording2024-10-01at10 36 40PM-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c7fde985-ee40-42ae-880e-264945f003ad)
 
+![ScreenRecording2024-10-01at10 36 40PM-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c7fde985-ee40-42ae-880e-264945f003ad)
 
 PS:what if you want to use if else but does not want to write 2 statements? ... I saw my follow classmates set 
 statement 2 to NA,but I haven't try it myself. 
+
+PS in PS: Personally, I consider `ifelse()` function as `if(){}else{}` loop zip format
