@@ -1,5 +1,5 @@
 ## Loop structure: if else loop
-new month new loop structure,Hooray. 。。。sort of? 
+new month new loop structure,Hooray...sort of? 
 Anyway, today we are talking about **if else** loop. And yes...it is kind of different from *if loop* we discussed in the pervious post.
 
 ## if else loop 
@@ -46,5 +46,5 @@ the operation result is as follow:
 ![ScreenRecording2024-10-01at10 36 40PM-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c7fde985-ee40-42ae-880e-264945f003ad)
 
 
-PS:what if you want to use if else but does not want to write 2 statements? 。。。I saw my follow classmates set 
+PS:what if you want to use if else but does not want to write 2 statements? ... I saw my follow classmates set 
 statement 2 to NA,but I haven't try it myself. 
