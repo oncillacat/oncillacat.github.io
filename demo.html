@@ -1290,7 +1290,7 @@ secs.forEach(s => new IntersectionObserver(entries => {
     const c = document.getElementById('pipe-viz'); c.innerHTML='';
     const s = STEPS[step];
     const panels = document.createElement('div'); panels.className = 'pipe-panels';
-    [['① Step-by-step',s.step],['② Pipe form',s.pipe]].forEach(([lbl,code])=>{
+    [['① Nested (hard to read)',s.nested],['② Step-by-step',s.step],['③ Pipe form',s.pipe]].forEach(([lbl,code])=>{
       const p=document.createElement('div'); p.className='pipe-panel'+(s.hl?' hl':'');
       const l=document.createElement('div'); l.className='pipe-panel-lbl'; l.textContent=lbl;
       const cd=document.createElement('div'); cd.className='pipe-code'; cd.innerHTML=enc(code);
