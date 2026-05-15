@@ -165,6 +165,24 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 .layer-row.locked .layer-cb{background:var(--navy);border-color:var(--navy);color:#fff;font-size:.7rem}
 .lkw{color:#C586C0} .lfn{color:#DCDCAA} .lstr{color:#CE9178} .lnum{color:#B5CEA8}
 
+/* ── dplyr Explorer ─────────────────── */
+.dplyr-explorer{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin:.75rem 0 1.25rem}
+.dplyr-verb-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.dplyr-verb-btn{padding:5px 14px;font-size:.83rem;font-family:'JetBrains Mono',monospace;border:1px solid var(--border);border-radius:20px;cursor:pointer;background:#fff;transition:background .15s,color .15s,border-color .15s}
+.dplyr-verb-btn:hover{background:var(--bg)}
+.dplyr-verb-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.dplyr-desc{font-size:.85rem;color:var(--text);margin-bottom:.75rem;min-height:1.4rem}
+.dplyr-desc strong{color:var(--navy)}
+.dplyr-mini-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.dplyr-mini-table th{background:var(--navy);color:#fff;padding:4px 8px;text-align:center;border:1px solid #1a406a}
+.dplyr-mini-table td{padding:3px 8px;text-align:center;border:1px solid var(--border);background:#fff;transition:background .25s,opacity .25s}
+.dplyr-mini-table tr.row-hl td{background:#D6EAF8}
+.dplyr-mini-table tr.row-dim td{opacity:.25}
+.dplyr-mini-table th.col-hl{background:#148F77}
+.dplyr-mini-table td.col-hl{background:#E9F7EF}
+.dplyr-mini-table th.col-dim,.dplyr-mini-table td.col-dim{opacity:.25}
+.dplyr-result-label{font-size:.73rem;color:var(--muted);margin-top:.5rem;font-style:italic}
+
 /* ── Mobile ──────────────────────────── */
 @media(max-width:768px){
   #sidebar-toggle{display:block}
@@ -184,7 +202,7 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
     <button id="sidebar-toggle" aria-label="Toggle sidebar">&#9776;</button>
     <span class="site-title">R for Bioinformatics</span>
   </div>
-  <span class="badge">&#128218; Demo Mode</span>
+
 </header>
 
 <div class="layout">
@@ -213,6 +231,7 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
         <li><a href="#b4" class="nav-link">B4 · Core dplyr</a></li>
         <li><a href="#b5" class="nav-link">B5 · The Pipe</a></li>
         <li><a href="#b6" class="nav-link">B6 · Grouping &amp; Summarising</a></li>
+        <li><a href="#b7" class="nav-link">B7 · dplyr Pipeline + lm()</a></li>
       </ul>
     </li>
     <li class="nav-module">
@@ -238,16 +257,17 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="cm"># Assign a single value</span>
-<span class="var">absorbance_single</span> <span class="op">&lt;-</span> <span class="num">0.95</span>
+    <pre><code><span class="var">a</span> <span class="op">&lt;-</span> <span class="num">34</span>       <span class="cm">## we assign the number 34 to the object a</span>
+<span class="var">b</span> <span class="op">&lt;-</span> <span class="str">'character'</span> <span class="cm">## we assign the word 'character' to the object b</span>
+<span class="var">a2</span> <span class="op">&lt;-</span> <span class="var">a</span> <span class="op">*</span> <span class="num">2</span>   <span class="cm">## multiply a times 2</span>
 
 <span class="cm"># Print by typing the name</span>
-<span class="var">absorbance_single</span>
-
-<span class="cm"># Arithmetic on objects</span>
-<span class="var">absorbance_single</span> <span class="op">*</span> <span class="num">2</span></code></pre>
-    <div class="output-block"><span class="out-comment"># [1] 0.95
-# [1] 1.9</span></div>
+<span class="var">a</span>
+<span class="var">b</span>
+<span class="var">a2</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 34
+# [1] "character"
+# [1] 68</span></div>
   </div>
 </section>
 
@@ -259,13 +279,29 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="var">absorbance</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.8</span>, <span class="num">0.6</span>, <span class="num">0.43</span>, <span class="num">0.36</span>, <span class="num">0.21</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>)
-<span class="var">experiments</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="str">"MTT"</span>, <span class="str">"BCA"</span>, <span class="str">"puromycin"</span>, <span class="str">"ROS"</span>)
+    <pre><code><span class="var">absorbance</span>    <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.80</span>, <span class="num">0.60</span>, <span class="num">0.43</span>, <span class="num">0.36</span>, <span class="num">0.21</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>)
+<span class="var">concentration</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">2000</span>, <span class="num">1500</span>, <span class="num">1000</span>, <span class="num">750</span>, <span class="num">500</span>, <span class="num">250</span>, <span class="num">125</span>, <span class="num">25</span>, <span class="num">0</span>)
+<span class="var">experiments</span>   <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="str">'MTT'</span>, <span class="str">'BCA'</span>, <span class="str">'puromycin'</span>, <span class="str">'ROS'</span>)
+<span class="var">puromycin</span>     <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">20</span>, <span class="num">10</span>, <span class="num">5</span>, <span class="num">2</span>, <span class="num">1</span>, <span class="num">0.5</span>, <span class="num">0.2</span>)
+
+<span class="cm"># Create a data frame from the vectors above</span>
+<span class="var">bsa_table</span> <span class="op">&lt;-</span> <span class="fn">data.frame</span>(<span class="var">concentration</span>, <span class="var">absorbance</span>)
+<span class="var">bsa_table</span>
 
 <span class="cm"># What happens when you mix types?</span>
 <span class="var">mixed</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">1</span>, <span class="str">"hello"</span>, <span class="kw">TRUE</span>)
 <span class="fn">class</span>(<span class="var">mixed</span>)</code></pre>
-    <div class="output-block"><span class="out-comment"># [1] "character"   ← everything coerced to character</span></div>
+    <div class="output-block"><span class="out-comment">#   concentration absorbance
+# 1          2000       0.95
+# 2          1500       0.80
+# 3          1000       0.60
+# 4           750       0.43
+# 5           500       0.36
+# 6           250       0.21
+# 7           125       0.14
+# 8            25       0.08
+# 9             0       0.06
+# [1] "character"   ← everything coerced to character</span></div>
   </div>
 
   <h3>Type Coercion Visualizer</h3>
@@ -302,16 +338,44 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 <!-- ═══ A4 ═══ -->
 <section id="a4" class="section-card">
   <h2><span class="section-tag">A4</span> Functions &amp; Arguments</h2>
-  <p>R functions take <strong>arguments</strong>. Pass them by name for clarity — especially optional ones.</p>
-  <div class="callout callout-tip"><strong>Tip:</strong> Use <code>?function_name</code> to open the help page. Use <code>args(function_name)</code> to see the argument list quickly.</div>
+  <p>Functions are <strong>"compacted scripts"</strong> that are already made for you to run lots of things at once. For example, you can calculate the square root or round numbers using built-in functions:</p>
 
   <div class="code-block">
-    <div class="code-block-label">R</div>
-    <pre><code><span class="var">absorbance</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.8</span>, <span class="num">0.6</span>, <span class="num">0.43</span>, <span class="kw">NA</span>, <span class="num">0.21</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>)
+    <div class="code-block-label">R — built-in functions</div>
+    <pre><code><span class="var">a</span> <span class="op">&lt;-</span> <span class="num">34</span>
+<span class="fn">sqrt</span>(<span class="var">a</span>)          <span class="cm">## calculate the square root of a</span>
+<span class="fn">round</span>(<span class="num">3.141592</span>)  <span class="cm">## round number (default: 0 decimal places)</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 5.830952
+# [1] 3</span></div>
+  </div>
 
-<span class="cm"># Named arguments — always prefer for optional args</span>
-<span class="fn">round</span>(<span class="fn">mean</span>(<span class="var">absorbance</span>, na.rm <span class="op">=</span> <span class="kw">TRUE</span>), digits <span class="op">=</span> <span class="num">2</span>)</code></pre>
-    <div class="output-block"><span class="out-comment"># [1] 0.44</span></div>
+  <p><strong>Arguments</strong> are the "conditions" of a function. For example, <code>round()</code> has an argument to set the number of decimal places — its default in R is <code>0</code>.</p>
+  <p>You can inspect a function's arguments with <code>args()</code>, or read its full help page with <code>?</code>:</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — inspecting arguments</div>
+    <pre><code><span class="fn">args</span>(<span class="fn">round</span>)  <span class="cm">## show the arguments of round()</span></code></pre>
+    <div class="output-block"><span class="out-comment"># function (x, digits = 0)
+# NULL</span></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-label">R — changing the digits argument</div>
+    <pre><code><span class="cm"># Specify by name</span>
+<span class="fn">round</span>(<span class="num">3.141592</span>, digits <span class="op">=</span> <span class="num">2</span>)
+
+<span class="cm"># R detects argument by position — name not required</span>
+<span class="fn">round</span>(<span class="num">3.141592</span>, <span class="num">2</span>)
+
+<span class="cm"># You can reorder arguments if you name them</span>
+<span class="fn">round</span>(digits <span class="op">=</span> <span class="num">2</span>, x <span class="op">=</span> <span class="num">3.141592</span>)</code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 3.14
+# [1] 3.14
+# [1] 3.14</span></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Best Practice:</strong> Put the <em>non-optional</em> arguments (the data you want the function to work on) <strong>first</strong>, then specify the names of all optional arguments. This makes your code much easier to read and understand.
   </div>
 </section>
 
@@ -324,21 +388,29 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
   <div class="subset-wrap" id="subset-viz"></div>
 
   <div class="code-block">
-    <div class="code-block-label">R</div>
-    <pre><code><span class="var">absorbance</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.8</span>, <span class="num">0.6</span>, <span class="num">0.43</span>, <span class="num">0.36</span>, <span class="num">0.21</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>)
+    <div class="code-block-label">R — by position</div>
+    <pre><code><span class="var">experiments</span>[<span class="num">2</span>]  <span class="cm">## second element</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] "BCA"</span></div>
+  </div>
 
-<span class="cm"># By position</span>
-<span class="var">absorbance</span>[<span class="fn">c</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>)]
+  <div class="code-block">
+    <div class="code-block-label">R — by condition (single)</div>
+    <pre><code><span class="var">absorbance</span>[<span class="var">absorbance</span> <span class="op">&gt;</span> <span class="num">0.5</span>]  <span class="cm">## condition</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 0.95 0.80 0.60</span></div>
+  </div>
 
-<span class="cm"># By condition</span>
-<span class="var">absorbance</span>[<span class="var">absorbance</span> <span class="op">&gt;</span> <span class="num">0.5</span>]
+  <div class="code-block">
+    <div class="code-block-label">R — OR and AND conditions</div>
+    <pre><code><span class="var">absorbance</span>[<span class="var">absorbance</span> <span class="op">&gt;</span> <span class="num">0.5</span> <span class="op">|</span> <span class="var">absorbance</span> <span class="op">&lt;</span> <span class="num">0.1</span>]  <span class="cm">## OR</span>
+<span class="var">absorbance</span>[<span class="var">absorbance</span> <span class="op">&gt;</span> <span class="num">0.1</span> <span class="op">&amp;</span> <span class="var">absorbance</span> <span class="op">&lt;</span> <span class="num">0.5</span>]  <span class="cm">## AND</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 0.95 0.80 0.60 0.08 0.06
+# [1] 0.43 0.36 0.21 0.14</span></div>
+  </div>
 
-<span class="cm"># %in% operator</span>
-<span class="var">experiments</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="str">"MTT"</span>, <span class="str">"BCA"</span>, <span class="str">"puromycin"</span>, <span class="str">"ROS"</span>)
-<span class="var">experiments</span>[<span class="var">experiments</span> <span class="op">%in%</span> <span class="fn">c</span>(<span class="str">"BCA"</span>, <span class="str">"ROS"</span>)]</code></pre>
-    <div class="output-block"><span class="out-comment"># [1] 0.95 0.60 0.36
-# [1] 0.95 0.80 0.60
-# [1] "BCA" "ROS"</span></div>
+  <div class="code-block">
+    <div class="code-block-label">R — %in% operator</div>
+    <pre><code><span class="var">experiments</span>[<span class="var">experiments</span> <span class="op">%in%</span> <span class="fn">c</span>(<span class="str">'BCA'</span>, <span class="str">'ROS'</span>)]</code></pre>
+    <div class="output-block"><span class="out-comment"># [1] "BCA" "ROS"</span></div>
   </div>
 </section>
 
@@ -352,16 +424,18 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="var">x</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.8</span>, <span class="kw">NA</span>, <span class="num">0.43</span>, <span class="num">0.36</span>, <span class="kw">NA</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>)
+    <pre><code><span class="var">concentration</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="num">43.903</span>, <span class="num">47.871</span>, <span class="kw">NA</span>, <span class="num">48.456</span>, <span class="num">53.435</span>)
 
-<span class="fn">mean</span>(<span class="var">x</span>)               <span class="cm"># NA is contagious</span>
-<span class="fn">mean</span>(<span class="var">x</span>, na.rm <span class="op">=</span> <span class="kw">TRUE</span>) <span class="cm"># correct way</span>
-<span class="fn">is.na</span>(<span class="var">x</span>)
-<span class="fn">na.omit</span>(<span class="var">x</span>)</code></pre>
+<span class="fn">mean</span>(<span class="var">concentration</span>)                       <span class="cm"># NA is contagious</span>
+<span class="fn">mean</span>(<span class="var">concentration</span>, na.rm <span class="op">=</span> <span class="kw">TRUE</span>)          <span class="cm"># correct way</span>
+<span class="var">concentration</span>[<span class="op">!</span><span class="fn">is.na</span>(<span class="var">concentration</span>)]       <span class="cm"># logical negation</span>
+<span class="fn">na.omit</span>(<span class="var">concentration</span>)                    <span class="cm"># remove NAs</span>
+<span class="var">concentration</span>[<span class="fn">complete.cases</span>(<span class="var">concentration</span>)]  <span class="cm"># same result</span></code></pre>
     <div class="output-block"><span class="out-comment"># [1] NA
-# [1] 0.4314286
-# [1] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE
-# [1] 0.95 0.80 0.43 0.36 0.14 0.08 0.06</span></div>
+# [1] 48.41625
+# [1] 43.903 47.871 48.456 53.435
+# [1] 43.903 47.871 48.456 53.435
+# [1] 43.903 47.871 48.456 53.435</span></div>
   </div>
 </section>
 
@@ -372,19 +446,23 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="var">treatment</span> <span class="op">&lt;-</span> <span class="fn">c</span>(<span class="str">"MTT"</span>, <span class="str">"BCA"</span>, <span class="str">"puromycin"</span>, <span class="str">"ROS"</span>, <span class="str">"MTT"</span>, <span class="str">"BCA"</span>)
-<span class="var">treatment_factor</span> <span class="op">&lt;-</span> <span class="fn">factor</span>(<span class="var">treatment</span>)
+    <pre><code><span class="var">experiments_f</span> <span class="op">&lt;-</span> <span class="fn">factor</span>(<span class="var">experiments</span>)  <span class="cm">## experiments defined in A2</span>
 
-<span class="fn">levels</span>(<span class="var">treatment_factor</span>)
-<span class="fn">nlevels</span>(<span class="var">treatment_factor</span>)
+<span class="fn">levels</span>(<span class="var">experiments_f</span>)
+<span class="fn">nlevels</span>(<span class="var">experiments_f</span>)
 
-<span class="cm"># Specify a custom order</span>
-<span class="var">treatment_ordered</span> <span class="op">&lt;-</span> <span class="fn">factor</span>(<span class="var">treatment</span>,
-  levels <span class="op">=</span> <span class="fn">c</span>(<span class="str">"MTT"</span>, <span class="str">"BCA"</span>, <span class="str">"puromycin"</span>, <span class="str">"ROS"</span>))
-<span class="fn">levels</span>(<span class="var">treatment_ordered</span>)</code></pre>
+<span class="cm"># Rename the first level</span>
+<span class="fn">levels</span>(<span class="var">experiments_f</span>)[<span class="num">1</span>] <span class="op">&lt;-</span> <span class="str">'bicinchoninic'</span>
+<span class="fn">levels</span>(<span class="var">experiments_f</span>)
+
+<span class="cm"># Convert back to character or to numeric codes</span>
+<span class="fn">as.character</span>(<span class="var">experiments_f</span>)
+<span class="fn">as.numeric</span>(<span class="var">experiments_f</span>)</code></pre>
     <div class="output-block"><span class="out-comment"># [1] "BCA"       "MTT"       "puromycin" "ROS"       ← alphabetical
 # [1] 4
-# [1] "MTT"       "BCA"       "puromycin" "ROS"       ← custom order</span></div>
+# [1] "bicinchoninic" "MTT"           "puromycin"     "ROS"
+# [1] "bicinchoninic" "MTT"           "puromycin"     "ROS"
+# [1] 1 2 3 4</span></div>
   </div>
 </section>
 
@@ -397,7 +475,11 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
   <div class="code-block">
     <div class="code-block-label">R</div>
     <pre><code><span class="fn">install.packages</span>(<span class="str">"tidyverse"</span>)  <span class="cm"># run once</span>
-<span class="fn">library</span>(<span class="var">tidyverse</span>)              <span class="cm"># run every session</span></code></pre>
+<span class="fn">library</span>(<span class="var">tidyverse</span>)              <span class="cm"># run every session</span>
+
+<span class="cm"># Download the course dataset</span>
+<span class="fn">download.file</span>(url <span class="op">=</span> <span class="str">'https://osf.io/ur5gh/download'</span>,
+              destfile <span class="op">=</span> <span class="str">'puromycin.csv'</span>)</code></pre>
     <div class="output-block"><span class="out-comment"># ── Attaching core tidyverse packages ───────────────
 # ✔ dplyr   1.1.4   ✔ readr   2.1.5
 # ✔ ggplot2 3.5.1   ✔ tibble  3.2.1  ...</span></div>
@@ -457,52 +539,127 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
 <!-- ═══ B4 ═══ -->
 <section id="b4" class="section-card">
-  <h2><span class="section-tag">B4</span> Core dplyr Verbs</h2>
-  <ul>
-    <li><code>mutate()</code> — add or modify columns</li>
-    <li><code>select()</code> — keep specific columns</li>
-    <li><code>filter()</code> — keep rows matching a condition</li>
-  </ul>
-  <div class="callout callout-tip"><strong>Tip:</strong> When using both <code>filter()</code> and <code>select()</code>, filter first so <code>select()</code> works on fewer rows.</div>
+  <h2><span class="section-tag">B4</span> dplyr Functions</h2>
+  <p>dplyr gives you a set of <strong>verb functions</strong> — just like in A4, each verb is a function with its own arguments. Click a verb below to see what it does to the data.</p>
 
+  <!-- Interactive verb explorer -->
+  <div id="dplyr-explorer"></div>
+
+  <div class="callout callout-tip"><strong>Tip:</strong> When using both <code>filter()</code> and <code>select()</code>, always <strong>filter first</strong> — then <code>select()</code> works on fewer rows.</div>
+
+  <!-- mutate -->
+  <h3><code>mutate()</code> — add or modify columns</h3>
+  <p>Creates a new column from existing ones. The first argument is the data frame; subsequent arguments are <code>new_col = expression</code>.</p>
   <div class="code-block">
     <div class="code-block-label">R — mutate()</div>
-    <pre><code><span class="var">experiment_info</span> <span class="op">&lt;-</span> <span class="fn">mutate</span>(<span class="var">experiment_info</span>,
-  mean_ABCD <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="fn">cbind</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>, <span class="var">D</span>), na.rm <span class="op">=</span> <span class="kw">TRUE</span>))
-
-<span class="fn">select</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span>, <span class="var">mean_ABCD</span>)</code></pre>
-    <div class="output-block"><span class="out-comment"># Treatment    mean_ABCD
-# MTT          0.9325
-# MTT          0.8775
-# BCA          0.795
-# BCA          0.435
-# puromycin    0.355
-# puromycin    0.215
-# ROS          0.135
-# ROS          0.085</span></div>
+    <pre><code><span class="cm"># Add a column with the row mean across all 14 replicates (cols 2–15)</span>
+<span class="var">experiment_info_mean</span> <span class="op">&lt;-</span> <span class="fn">mutate</span>(<span class="var">experiment_info</span>,
+  average_abs <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="var">experiment_info</span>[, <span class="num">2</span><span class="op">:</span><span class="num">15</span>]))</code></pre>
+    <div class="output-block"><span class="out-comment"># Treatment    A     ...  average_abs
+# MTT          0.95  ...  0.9321
+# MTT          0.88  ...  0.8779
+# BCA          0.80  ...  0.7950
+# BCA          0.43  ...  0.4350
+# ...</span></div>
   </div>
 
+  <div class="callout callout-tip"><strong>Exercise 1:</strong> Add <em>two</em> new columns in one <code>mutate()</code> call — the raw row mean and a rounded version:</div>
+  <div class="code-block">
+    <div class="code-block-label">R — Exercise 1</div>
+    <pre><code><span class="var">experiment_info_mean_round</span> <span class="op">&lt;-</span> <span class="var">experiment_info</span> <span class="op">%>%</span>
+  <span class="fn">mutate</span>(average_absorbance <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="var">experiment_info</span>[, <span class="num">2</span><span class="op">:</span><span class="num">15</span>]),
+         abs_round           <span class="op">=</span> <span class="fn">round</span>(average_absorbance, <span class="num">4</span>))</code></pre>
+    <div class="output-block"><span class="out-comment"># Treatment    A     ...  average_absorbance  abs_round
+# MTT          0.95  ...  0.93214286          0.9321
+# MTT          0.88  ...  0.87785714          0.8779
+# BCA          0.80  ...  0.79500000          0.7950
+# BCA          0.43  ...  0.43500000          0.4350
+# ...</span></div>
+  </div>
+
+  <!-- select -->
+  <h3><code>select()</code> — keep or drop columns</h3>
+  <p>Keeps only the columns you name. Use <code>-col</code> to drop a column instead.</p>
+  <div class="code-block">
+    <div class="code-block-label">R — select()</div>
+    <pre><code><span class="cm"># Keep only Treatment and first four replicates</span>
+<span class="fn">select</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span>, <span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>, <span class="var">D</span>)
+
+<span class="cm"># Drop a column with -</span>
+<span class="fn">select</span>(<span class="var">experiment_info</span>, <span class="op">-</span><span class="var">N</span>)
+
+<span class="cm"># Keep a range of columns</span>
+<span class="fn">select</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span>, <span class="var">A</span><span class="op">:</span><span class="var">D</span>)</code></pre>
+    <div class="output-block"><span class="out-comment"># Treatment    A     B     C     D
+# MTT          0.95  0.93  0.91  0.94
+# MTT          0.88  0.87  0.90  0.86
+# BCA          0.80  0.79  0.81  0.78
+# ...</span></div>
+  </div>
+
+  <!-- filter -->
+  <h3><code>filter()</code> — keep rows matching a condition</h3>
+  <p>Keeps rows where the condition is <code>TRUE</code>. Multiple conditions are combined with <code>&amp;</code> (AND) — or use <code>|</code> for OR.</p>
   <div class="code-block">
     <div class="code-block-label">R — filter()</div>
-    <pre><code><span class="fn">filter</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>, <span class="var">A</span> <span class="op">&gt;</span> <span class="num">0.5</span>)</code></pre>
-    <div class="output-block"><span class="out-comment"># Treatment  A     B     C     D  ...
-# BCA        0.80  0.79  0.81  0.78  ...</span></div>
+    <pre><code><span class="cm"># Single condition</span>
+<span class="fn">filter</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>)
+
+<span class="cm"># Multiple conditions (AND)</span>
+<span class="fn">filter</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>, <span class="var">A</span> <span class="op">&gt;</span> <span class="num">0.5</span>)
+
+<span class="cm"># Match several values at once with %in%</span>
+<span class="fn">filter</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span> <span class="op">%in%</span> <span class="fn">c</span>(<span class="str">"BCA"</span>, <span class="str">"MTT"</span>))</code></pre>
+    <div class="output-block"><span class="out-comment"># Single condition → 2 rows (both BCA rows)
+# Multiple conditions → 1 row (BCA row where A > 0.5)
+# %in% → 4 rows (both BCA and both MTT rows)</span></div>
+  </div>
+
+  <!-- arrange -->
+  <h3><code>arrange()</code> — sort rows</h3>
+  <p>Sorts the tibble by one or more columns. Wrap in <code>desc()</code> for descending order.</p>
+  <div class="code-block">
+    <div class="code-block-label">R — arrange()</div>
+    <pre><code><span class="cm"># Sort by column A ascending (lowest first)</span>
+<span class="fn">arrange</span>(<span class="var">experiment_info</span>, <span class="var">A</span>)
+
+<span class="cm"># Sort descending (highest first)</span>
+<span class="fn">arrange</span>(<span class="var">experiment_info</span>, <span class="fn">desc</span>(<span class="var">A</span>))</code></pre>
+    <div class="output-block"><span class="out-comment"># Ascending:          Descending:
+# Treatment  A        Treatment  A
+# ROS        0.08     MTT        0.95
+# ROS        0.14     MTT        0.88
+# puromycin  0.21     BCA        0.80
+# ...</span></div>
+  </div>
+
+  <!-- count -->
+  <h3><code>count()</code> — tally rows per group</h3>
+  <p>A quick shortcut: counts how many rows exist for each unique value of a column.</p>
+  <div class="code-block">
+    <div class="code-block-label">R — count()</div>
+    <pre><code><span class="fn">count</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span>)</code></pre>
+    <div class="output-block"><span class="out-comment"># Treatment    n
+# BCA          2
+# MTT          2
+# puromycin    2
+# ROS          2</span></div>
   </div>
 </section>
 
 <!-- ═══ B5 ═══ -->
 <section id="b5" class="section-card">
   <h2><span class="section-tag">B5</span> The Pipe Operator</h2>
-  <p>The pipe <code>|&gt;</code> passes the output of one function directly into the next — eliminating nested calls and intermediate variables.</p>
+  <p>The pipe <code>%>%</code> passes the output of one function directly into the next — eliminating nested calls and intermediate variables.</p>
 
   <h3>Three ways to write the same pipeline</h3>
   <div id="pipe-viz"></div>
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="var">experiment_info</span> <span class="op">|&gt;</span>
-  <span class="fn">mutate</span>(mean_ABCD <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="fn">cbind</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>, <span class="var">D</span>), na.rm <span class="op">=</span> <span class="kw">TRUE</span>)) <span class="op">|&gt;</span>
-  <span class="fn">filter</span>(<span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>) <span class="op">|&gt;</span>
+    <pre><code><span class="var">experiment_info</span> <span class="op">%>%</span>
+  <span class="fn">mutate</span>(mean_ABCD <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="fn">cbind</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>, <span class="var">D</span>), na.rm <span class="op">=</span> <span class="kw">TRUE</span>)) <span class="op">%>%</span>
+  <span class="fn">filter</span>(<span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>) <span class="op">%>%</span>
   <span class="fn">select</span>(<span class="var">Treatment</span>, <span class="var">mean_ABCD</span>)</code></pre>
     <div class="output-block"><span class="out-comment"># Treatment  mean_ABCD
 # BCA        0.795
@@ -514,18 +671,148 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 <section id="b6" class="section-card">
   <h2><span class="section-tag">B6</span> Grouping &amp; Summarising</h2>
 
+  <!-- group_by -->
+  <h3><code>group_by()</code> — split data into groups</h3>
+  <p><code>group_by()</code> does not change the data itself — it adds invisible <strong>group labels</strong> so that the next function operates on each group separately. It is almost always paired with <code>summarize()</code>.</p>
+
   <div class="code-block">
-    <div class="code-block-label">R</div>
-    <pre><code><span class="var">experiment_info</span> <span class="op">|&gt;</span>
-  <span class="fn">group_by</span>(<span class="var">Treatment</span>) <span class="op">|&gt;</span>
+    <div class="code-block-label">R — group_by() alone changes nothing visible</div>
+    <pre><code><span class="cm"># Before grouping</span>
+<span class="fn">nrow</span>(<span class="var">experiment_info</span>)         <span class="cm">## still 8 rows</span>
+
+<span class="cm"># After grouping — same 8 rows, but now labelled internally</span>
+<span class="var">grouped</span> <span class="op">&lt;-</span> <span class="fn">group_by</span>(<span class="var">experiment_info</span>, <span class="var">Treatment</span>)
+<span class="fn">nrow</span>(<span class="var">grouped</span>)                  <span class="cm">## still 8 rows</span>
+<span class="fn">groups</span>(<span class="var">grouped</span>)                <span class="cm">## shows the active grouping</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 8
+# [1] 8
+# &lt;list_of&lt;sym&gt;&gt;
+# [[1]]
+# Treatment</span></div>
+  </div>
+
+  <div class="callout callout-note"><strong>Note:</strong> After <code>group_by()</code>, every subsequent dplyr verb runs <em>per group</em> until you call <code>ungroup()</code> to remove the grouping.</div>
+
+  <!-- summarize -->
+  <h3><code>summarize()</code> — collapse each group to one row</h3>
+  <p>Reduces each group down to a single summary row. Arguments are <code>new_col = summary_function(col)</code>. Common summary functions: <code>mean()</code>, <code>sd()</code>, <code>median()</code>, <code>n()</code>, <code>min()</code>, <code>max()</code>.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — group_by() + summarize()</div>
+    <pre><code><span class="var">experiment_info</span> <span class="op">%>%</span>
+  <span class="fn">group_by</span>(<span class="var">Treatment</span>) <span class="op">%>%</span>
+  <span class="fn">summarize</span>(
+    n      <span class="op">=</span> <span class="fn">n</span>(),                          <span class="cm">## count rows per group</span>
+    mean_A <span class="op">=</span> <span class="fn">mean</span>(<span class="var">A</span>, na.rm <span class="op">=</span> <span class="kw">TRUE</span>),
+    sd_A   <span class="op">=</span> <span class="fn">sd</span>(<span class="var">A</span>,   na.rm <span class="op">=</span> <span class="kw">TRUE</span>)
+  )</code></pre>
+    <div class="output-block"><span class="out-comment"># Treatment    n   mean_A   sd_A
+# BCA          2   0.615    0.255
+# MTT          2   0.915    0.0495
+# puromycin    2   0.285    0.106
+# ROS          2   0.110    0.0424</span></div>
+  </div>
+
+  <!-- Full pipeline -->
+  <h3>Full pipeline: <code>group_by()</code> + <code>summarize()</code> + <code>arrange()</code></h3>
+  <p>Combining all three gives a clean ranked summary table in one readable pipeline.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — full pipeline</div>
+    <pre><code><span class="var">experiment_info</span> <span class="op">%>%</span>
+  <span class="fn">group_by</span>(<span class="var">Treatment</span>) <span class="op">%>%</span>
   <span class="fn">summarize</span>(mean_A <span class="op">=</span> <span class="fn">mean</span>(<span class="var">A</span>, na.rm <span class="op">=</span> <span class="kw">TRUE</span>),
-            sd_A   <span class="op">=</span> <span class="fn">sd</span>(<span class="var">A</span>,   na.rm <span class="op">=</span> <span class="kw">TRUE</span>)) <span class="op">|&gt;</span>
-  <span class="fn">arrange</span>(<span class="fn">desc</span>(<span class="var">mean_A</span>))</code></pre>
+            sd_A   <span class="op">=</span> <span class="fn">sd</span>(<span class="var">A</span>,   na.rm <span class="op">=</span> <span class="kw">TRUE</span>)) <span class="op">%>%</span>
+  <span class="fn">arrange</span>(<span class="fn">desc</span>(<span class="var">mean_A</span>))          <span class="cm">## sort by highest mean first</span></code></pre>
     <div class="output-block"><span class="out-comment"># Treatment    mean_A   sd_A
 # MTT          0.915    0.0495
 # BCA          0.615    0.255
 # puromycin    0.285    0.106
 # ROS          0.110    0.0424</span></div>
+  </div>
+</section>
+
+<!-- ═══ EX3 ═══ -->
+<section id="b7" class="section-card">
+  <h2><span class="section-tag">B7</span> dplyr Pipeline → Linear Regression</h2>
+  <p>This exercise ties together everything from Modules A and B: use <code>pipes</code>, <code>mutate()</code>, <code>filter()</code>, and <code>select()</code> to reduce the dataset, then fit a linear model to calculate protein concentrations.</p>
+
+  <!-- Step 1 -->
+  <h3>Step 1 — Build <code>experiment_info_reduced</code> with a pipeline</h3>
+  <p>Start from <code>experiment_info</code>. Use <code>mutate()</code> to compute a rounded row mean, <code>filter()</code> to keep only the BCA assay rows, and <code>select()</code> to retain just the columns you need.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — pipes + mutate + filter + select</div>
+    <pre><code><span class="fn">library</span>(<span class="var">tidyverse</span>)
+<span class="var">experiment_info</span> <span class="op">&lt;-</span> <span class="fn">read_csv</span>(<span class="str">"puromycin.csv"</span>)
+
+<span class="var">experiment_info_mean</span> <span class="op">&lt;-</span> <span class="var">experiment_info</span> <span class="op">%>%</span>
+  <span class="fn">mutate</span>(average_absorbance <span class="op">=</span> <span class="fn">rowMeans</span>(<span class="var">experiment_info</span>[, <span class="num">2</span><span class="op">:</span><span class="num">15</span>]),
+         abs_round           <span class="op">=</span> <span class="fn">round</span>(average_absorbance, <span class="num">4</span>)) <span class="op">%>%</span>
+  <span class="fn">filter</span>(<span class="var">Treatment</span> <span class="op">==</span> <span class="str">"BCA"</span>) <span class="op">%>%</span>
+  <span class="fn">select</span>(<span class="var">Treatment</span>, <span class="var">abs_round</span>)
+
+<span class="var">experiment_info_mean</span></code></pre>
+    <div class="output-block"><span class="out-comment"># A tibble: 2 × 2
+#   Treatment  abs_round
+#   &lt;chr&gt;          &lt;dbl&gt;
+# 1 BCA            0.7950
+# 2 BCA            0.4350</span></div>
+  </div>
+
+  <!-- Step 2 -->
+  <h3>Step 2 — Fit a linear model with <code>lm()</code></h3>
+  <p><code>lm()</code> fits a linear regression following the formula <strong>y = ax + b</strong>, where y is absorbance and x is concentration. The <code>formula</code> argument uses R's <code>~</code> notation: <em>"absorbance as a function of concentration"</em>.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — lm() on the BCA standard curve</div>
+    <pre><code><span class="cm"># Standard curve data (known concentrations + measured absorbances)</span>
+<span class="var">bsa_table</span> <span class="op">&lt;-</span> <span class="fn">tibble</span>(
+  absorbance    <span class="op">=</span> <span class="fn">c</span>(<span class="num">0.95</span>, <span class="num">0.80</span>, <span class="num">0.60</span>, <span class="num">0.43</span>, <span class="num">0.36</span>, <span class="num">0.21</span>, <span class="num">0.14</span>, <span class="num">0.08</span>, <span class="num">0.06</span>),
+  concentration <span class="op">=</span> <span class="fn">c</span>(<span class="num">2000</span>, <span class="num">1500</span>, <span class="num">1000</span>, <span class="num">750</span>, <span class="num">500</span>, <span class="num">250</span>, <span class="num">125</span>, <span class="num">25</span>, <span class="num">0</span>)
+)
+
+<span class="var">linear_model</span> <span class="op">&lt;-</span> <span class="fn">lm</span>(formula <span class="op">=</span> absorbance <span class="op">~</span> concentration, data <span class="op">=</span> <span class="var">bsa_table</span>)
+<span class="fn">summary</span>(<span class="var">linear_model</span>)</code></pre>
+    <div class="output-block"><span class="out-comment"># Call:
+# lm(formula = absorbance ~ concentration, data = bsa_table)
+#
+# Coefficients:
+#               Estimate  Std. Error  t value  Pr(&gt;|t|)
+# (Intercept)  4.882e-02  2.441e-02    2.000    0.0859
+# concentration 4.403e-04  2.226e-05   19.782  3.35e-07 ***
+#
+# R-squared: 0.9797   ← 97.97% of variance explained by the model</span></div>
+  </div>
+
+  <!-- Step 3 -->
+  <h3>Step 3 — Extract the coefficients</h3>
+  <p><code>coefficients()</code> returns a named vector: <code>[1]</code> is the <strong>intercept</strong> (b), and <code>[2]</code> is the <strong>slope</strong> (a). We subset them with <code>[]</code> just like any other vector.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — subsetting coefficients</div>
+    <pre><code><span class="fn">coefficients</span>(<span class="var">linear_model</span>)          <span class="cm"># see both coefficients</span>
+
+<span class="var">intercept</span>     <span class="op">&lt;-</span> <span class="fn">coefficients</span>(<span class="var">linear_model</span>)[<span class="num">1</span>]  <span class="cm"># b (intercept)</span>
+<span class="var">concentration</span> <span class="op">&lt;-</span> <span class="fn">coefficients</span>(<span class="var">linear_model</span>)[<span class="num">2</span>]  <span class="cm"># a (slope)</span></code></pre>
+    <div class="output-block"><span class="out-comment">#   (Intercept) concentration
+#  4.882e-02    4.403e-04</span></div>
+  </div>
+
+  <!-- Step 4 -->
+  <h3>Step 4 — Calculate protein levels</h3>
+  <p>Rearranging <strong>y = ax + b</strong> to solve for x (concentration) gives: <strong>x = (y − b) / a</strong>. We apply this to the <code>abs_round</code> column from our reduced dataset.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — apply the formula</div>
+    <pre><code><span class="cm"># x = (y - intercept) / slope</span>
+<span class="var">protein_levels</span> <span class="op">&lt;-</span> (<span class="var">experiment_info_mean</span><span class="op">$</span><span class="var">abs_round</span> <span class="op">-</span> <span class="var">intercept</span>) <span class="op">/</span> <span class="var">concentration</span>
+<span class="var">protein_levels</span></code></pre>
+    <div class="output-block"><span class="out-comment"># [1] 1706.  866.</span></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>What just happened?</strong> You used the BCA standard curve (known absorbance → known concentration) to build a model, then applied that model to your <em>unknown</em> samples — converting their absorbance readings into estimated protein concentrations (µg/mL).
   </div>
 </section>
 
@@ -578,25 +865,31 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:.88em;backgrou
 
   <div class="code-block">
     <div class="code-block-label">R</div>
-    <pre><code><span class="fn">ggplot</span>(<span class="var">df</span>, <span class="fn">aes</span>(x <span class="op">=</span> <span class="var">concentration</span>, y <span class="op">=</span> <span class="var">absorbance</span>)) <span class="op">+</span>
-  <span class="fn">geom_point</span>(colour <span class="op">=</span> <span class="str">"#1A5276"</span>, size <span class="op">=</span> <span class="num">3</span>) <span class="op">+</span>
-  <span class="fn">geom_smooth</span>(method <span class="op">=</span> <span class="str">"lm"</span>, colour <span class="op">=</span> <span class="str">"#148F77"</span>) <span class="op">+</span>
-  <span class="fn">labs</span>(title <span class="op">=</span> <span class="str">"BCA Standard Curve"</span>) <span class="op">+</span>
-  <span class="fn">theme_minimal</span>()</code></pre>
+    <pre><code><span class="fn">ggplot</span>(data <span class="op">=</span> <span class="var">bsa_table</span>, mapping <span class="op">=</span> <span class="fn">aes</span>(x <span class="op">=</span> <span class="var">absorbance</span>, y <span class="op">=</span> <span class="var">concentration</span>)) <span class="op">+</span>
+  <span class="fn">geom_point</span>(alpha <span class="op">=</span> <span class="num">0.5</span>, color <span class="op">=</span> <span class="str">"red"</span>) <span class="op">+</span>
+  <span class="fn">geom_smooth</span>(method <span class="op">=</span> <span class="str">'lm'</span>)</code></pre>
   </div>
 </section>
 
 <!-- ═══ C4 ═══ -->
 <section id="c4" class="section-card">
-  <h2><span class="section-tag">C4</span> Boxplots</h2>
-  <p><code>geom_boxplot()</code> shows the distribution per group. Use <code>fill = Treatment</code> to colour by group.</p>
+  <h2><span class="section-tag">C4</span> Boxplots &amp; Point Plots</h2>
+  <p><code>geom_boxplot()</code> shows the distribution per group. <code>geom_point()</code> on a categorical x-axis gives a dot-strip plot — useful for small datasets.</p>
+
+  <div class="code-block">
+    <div class="code-block-label">R — point plot per treatment group</div>
+    <pre><code><span class="fn">ggplot</span>(data <span class="op">=</span> <span class="var">experiment_info_mean_round</span>,
+       mapping <span class="op">=</span> <span class="fn">aes</span>(x <span class="op">=</span> <span class="var">Treatment</span>, y <span class="op">=</span> <span class="var">abs_round</span>)) <span class="op">+</span>
+  <span class="fn">geom_point</span>()</code></pre>
+    <div class="output-block"><span class="out-comment"># Plots one point per row, grouped on x-axis by Treatment</span></div>
+  </div>
 
   <div class="chart-wrap">
     <canvas id="box-chart" height="220"></canvas>
   </div>
 
   <div class="code-block">
-    <div class="code-block-label">R</div>
+    <div class="code-block-label">R — boxplot per treatment group</div>
     <pre><code><span class="fn">ggplot</span>(<span class="var">long_data</span>, <span class="fn">aes</span>(x <span class="op">=</span> <span class="var">Treatment</span>, y <span class="op">=</span> <span class="var">absorbance</span>, fill <span class="op">=</span> <span class="var">Treatment</span>)) <span class="op">+</span>
   <span class="fn">geom_boxplot</span>(alpha <span class="op">=</span> <span class="num">0.7</span>) <span class="op">+</span>
   <span class="fn">theme_minimal</span>()</code></pre>
@@ -630,6 +923,196 @@ secs.forEach(s => new IntersectionObserver(entries => {
     if (e.isIntersecting)
       links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
 }, { rootMargin: '-68px 0px -60% 0px', threshold: 0 }).observe(s));
+
+// ════════════════════════════════════════
+// dplyr Verb Explorer
+// ════════════════════════════════════════
+(function() {
+  const COLS = ['Treatment','A','B','C','D','...','N'];
+  const ROWS = [
+    ['MTT',       '0.95','0.93','0.91','0.94','…','0.94'],
+    ['MTT',       '0.88','0.87','0.90','0.86','…','0.89'],
+    ['BCA',       '0.80','0.79','0.81','0.78','…','0.80'],
+    ['BCA',       '0.43','0.44','0.42','0.45','…','0.43'],
+    ['puromycin', '0.36','0.35','0.37','0.34','…','0.36'],
+    ['puromycin', '0.21','0.22','0.20','0.23','…','0.21'],
+    ['ROS',       '0.14','0.13','0.15','0.12','…','0.14'],
+    ['ROS',       '0.08','0.09','0.07','0.10','…','0.08'],
+  ];
+
+  const VERBS = [
+    {
+      name: 'mutate()',
+      desc: '<strong>mutate()</strong> adds new columns without removing existing ones — here adding <code>mean_ABCD</code>.',
+      hlCols: [0,1,2,3,4],   // highlight input cols used
+      newCol: 'mean_ABCD',
+      hlRows: 'all',
+      result: 'New column added →',
+      newColVals: ['0.933','0.878','0.795','0.435','0.355','0.215','0.135','0.085'],
+    },
+    {
+      name: 'select()',
+      desc: '<strong>select()</strong> keeps only the columns you name — all rows stay.',
+      hlCols: [0,1,2,3,4],   // kept
+      dimCols: [5,6],          // dropped
+      hlRows: 'all',
+      result: 'Columns not selected are removed →',
+    },
+    {
+      name: 'filter()',
+      desc: '<strong>filter()</strong> keeps only rows where <code>Treatment == "BCA"</code> — all columns stay.',
+      hlCols: 'all',
+      hlRows: [2,3],
+      dimRows: [0,1,4,5,6,7],
+      result: 'Only matching rows kept →',
+    },
+    {
+      name: 'arrange()',
+      desc: '<strong>arrange(desc(A))</strong> reorders rows from highest to lowest A — nothing is removed.',
+      hlCols: [1],
+      hlRows: 'all',
+      result: 'Rows reordered by column A (descending) →',
+      reorder: [0,1,2,3,4,5,6,7], // already desc by A in our data
+    },
+    {
+      name: 'count()',
+      desc: '<strong>count(Treatment)</strong> tallies how many rows each Treatment group has.',
+      hlCols: [0],
+      hlRows: 'all',
+      result: 'Returns a new 2-column summary tibble →',
+      countResult: [['MTT','2'],['BCA','2'],['puromycin','2'],['ROS','2']],
+    },
+  ];
+
+  let active = null;
+
+  function render() {
+    const c = document.getElementById('dplyr-explorer');
+    if (!c) return;
+    c.innerHTML = '';
+    c.className = 'dplyr-explorer';
+
+    // Verb buttons
+    const btns = document.createElement('div');
+    btns.className = 'dplyr-verb-btns';
+    VERBS.forEach((v, i) => {
+      const b = document.createElement('button');
+      b.className = 'dplyr-verb-btn' + (active === i ? ' active' : '');
+      b.textContent = v.name;
+      b.addEventListener('click', () => { active = active === i ? null : i; render(); });
+      btns.appendChild(b);
+    });
+    c.appendChild(btns);
+
+    // Description
+    const desc = document.createElement('div');
+    desc.className = 'dplyr-desc';
+    desc.innerHTML = active !== null ? VERBS[active].desc : 'Click a verb to see what it does to the data.';
+    c.appendChild(desc);
+
+    const verb = active !== null ? VERBS[active] : null;
+
+    // If count — show special result table
+    if (verb && verb.countResult) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap';
+
+      // Original table (dimmed except Treatment col)
+      const orig = buildTable(verb, false);
+      const origWrap = document.createElement('div');
+      const origLbl = document.createElement('div'); origLbl.className='dplyr-result-label'; origLbl.textContent='Input tibble';
+      origWrap.appendChild(origLbl); origWrap.appendChild(orig);
+
+      // Result table
+      const resTbl = document.createElement('table'); resTbl.className = 'dplyr-mini-table';
+      const rHead = document.createElement('thead');
+      const rHr = document.createElement('tr');
+      ['Treatment','n'].forEach(h => { const th=document.createElement('th'); th.className='col-hl'; th.textContent=h; rHr.appendChild(th); });
+      rHead.appendChild(rHr);
+      const rTypR = document.createElement('tr');
+      ['<chr>','<int>'].forEach(t => { const td=document.createElement('td'); td.style.cssText='font-size:.68rem;color:#AED6F1;background:#2C3E50'; td.textContent=t; rTypR.appendChild(td); });
+      rHead.appendChild(rTypR);
+      resTbl.appendChild(rHead);
+      const rBody = document.createElement('tbody');
+      verb.countResult.forEach(row => {
+        const tr = document.createElement('tr'); tr.className='row-hl';
+        row.forEach(v => { const td=document.createElement('td'); td.className='col-hl'; td.textContent=v; tr.appendChild(td); });
+        rBody.appendChild(tr);
+      });
+      resTbl.appendChild(rBody);
+      const resWrap = document.createElement('div');
+      const resLbl = document.createElement('div'); resLbl.className='dplyr-result-label'; resLbl.textContent=verb.result;
+      resWrap.appendChild(resLbl); resWrap.appendChild(resTbl);
+
+      wrap.append(origWrap, document.createTextNode(' → '), resWrap);
+      c.appendChild(wrap);
+      return;
+    }
+
+    // If mutate — show table with extra column appended
+    if (verb && verb.newCol) {
+      const tbl = buildTable(verb, true);
+      const lbl = document.createElement('div'); lbl.className='dplyr-result-label'; lbl.textContent=verb.result;
+      c.appendChild(lbl); c.appendChild(tbl);
+      return;
+    }
+
+    // Default: show standard table
+    const tbl = buildTable(verb, false);
+    if (verb) { const lbl=document.createElement('div'); lbl.className='dplyr-result-label'; lbl.textContent=verb.result; c.appendChild(lbl); }
+    c.appendChild(tbl);
+  }
+
+  function buildTable(verb, showNewCol) {
+    const tbl = document.createElement('table');
+    tbl.className = 'dplyr-mini-table';
+
+    // Header
+    const thead = document.createElement('thead');
+    const hRow = document.createElement('tr');
+    COLS.forEach((col, ci) => {
+      const th = document.createElement('th');
+      th.textContent = col;
+      if (verb) {
+        if (verb.hlCols === 'all' || (Array.isArray(verb.hlCols) && verb.hlCols.includes(ci))) th.className = 'col-hl';
+        else if (Array.isArray(verb.dimCols) && verb.dimCols.includes(ci)) th.className = 'col-dim';
+      }
+      hRow.appendChild(th);
+    });
+    if (showNewCol && verb && verb.newCol) {
+      const th = document.createElement('th'); th.className='col-hl'; th.textContent=verb.newCol; hRow.appendChild(th);
+    }
+    thead.appendChild(hRow);
+    tbl.appendChild(thead);
+
+    // Body
+    const tbody = document.createElement('tbody');
+    ROWS.forEach((row, ri) => {
+      const tr = document.createElement('tr');
+      if (verb) {
+        if (verb.hlRows === 'all' || (Array.isArray(verb.hlRows) && verb.hlRows.includes(ri))) tr.className='row-hl';
+        else if (Array.isArray(verb.dimRows) && verb.dimRows.includes(ri)) tr.className='row-dim';
+      }
+      row.forEach((val, ci) => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        if (verb) {
+          if (verb.hlCols === 'all' || (Array.isArray(verb.hlCols) && verb.hlCols.includes(ci))) td.className='col-hl';
+          else if (Array.isArray(verb.dimCols) && verb.dimCols.includes(ci)) td.className='col-dim';
+        }
+        tr.appendChild(td);
+      });
+      if (showNewCol && verb && verb.newColVals) {
+        const td = document.createElement('td'); td.className='col-hl'; td.textContent=verb.newColVals[ri]; tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    return tbl;
+  }
+
+  render();
+})();
 
 // ════════════════════════════════════════
 // Coercion Visualizer
@@ -751,7 +1234,7 @@ secs.forEach(s => new IntersectionObserver(entries => {
 // NA Visualizer
 // ════════════════════════════════════════
 (function() {
-  const VALS=[0.95,0.80,null,0.43,0.36,null,0.14,0.08,0.06];
+  const VALS=[43.903,47.871,null,48.456,53.435];
   const ZERO=VALS.map(v=>v===null?0:v);
   const mean=a=>a.filter(v=>v!==null).reduce((s,v)=>s+v,0)/a.filter(v=>v!==null).length;
   const meanZ=a=>a.reduce((s,v)=>s+v,0)/a.length;
@@ -793,10 +1276,10 @@ secs.forEach(s => new IntersectionObserver(entries => {
 // ════════════════════════════════════════
 (function() {
   const STEPS = [
-    { label: 'Step 0 — Start', nested: `summarize(\n  group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\nstep2 <- group_by(step1,\n         Treatment)\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info |>\n  filter(Treatment == "BCA") |>\n  group_by(Treatment) |>\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: null },
-    { label: 'Step 1 — filter()', nested: `summarize(\n  group_by(\n    <h>filter(experiment_info,\n           Treatment == "BCA")</h>,\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))`, step: `<h>step1 <- filter(experiment_info,\n         Treatment == "BCA")</h>\nstep2 <- group_by(step1, Treatment)\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info |>\n  <h>filter(Treatment == "BCA")</h> |>\n  group_by(Treatment) |>\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: true },
-    { label: 'Step 2 — group_by()', nested: `summarize(\n  <h>group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment)</h>,\n  mean_A = mean(A, na.rm = TRUE))`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\n<h>step2 <- group_by(step1,\n         Treatment)</h>\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info |>\n  filter(Treatment == "BCA") |>\n  <h>group_by(Treatment)</h> |>\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: true },
-    { label: 'Step 3 — summarize()', nested: `<h>summarize(\n  group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))</h>`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\nstep2 <- group_by(step1, Treatment)\n<h>step3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))</h>`, pipe: `experiment_info |>\n  filter(Treatment == "BCA") |>\n  group_by(Treatment) |>\n  <h>summarize(mean_A = mean(A,\n    na.rm = TRUE))</h>`, hl: true },
+    { label: 'Step 0 — Start', nested: `summarize(\n  group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\nstep2 <- group_by(step1,\n         Treatment)\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info %>%\n  filter(Treatment == "BCA") %>%\n  group_by(Treatment) %>%\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: null },
+    { label: 'Step 1 — filter()', nested: `summarize(\n  group_by(\n    <h>filter(experiment_info,\n           Treatment == "BCA")</h>,\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))`, step: `<h>step1 <- filter(experiment_info,\n         Treatment == "BCA")</h>\nstep2 <- group_by(step1, Treatment)\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info %>%\n  <h>filter(Treatment == "BCA")</h> %>%\n  group_by(Treatment) %>%\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: true },
+    { label: 'Step 2 — group_by()', nested: `summarize(\n  <h>group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment)</h>,\n  mean_A = mean(A, na.rm = TRUE))`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\n<h>step2 <- group_by(step1,\n         Treatment)</h>\nstep3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))`, pipe: `experiment_info %>%\n  filter(Treatment == "BCA") %>%\n  <h>group_by(Treatment)</h> %>%\n  summarize(mean_A = mean(A,\n    na.rm = TRUE))`, hl: true },
+    { label: 'Step 3 — summarize()', nested: `<h>summarize(\n  group_by(\n    filter(experiment_info,\n           Treatment == "BCA"),\n    Treatment),\n  mean_A = mean(A, na.rm = TRUE))</h>`, step: `step1 <- filter(experiment_info,\n         Treatment == "BCA")\nstep2 <- group_by(step1, Treatment)\n<h>step3 <- summarize(step2,\n         mean_A = mean(A, na.rm = TRUE))</h>`, pipe: `experiment_info %>%\n  filter(Treatment == "BCA") %>%\n  group_by(Treatment) %>%\n  <h>summarize(mean_A = mean(A,\n    na.rm = TRUE))</h>`, hl: true },
   ];
   let step = 0;
   function enc(s) {
@@ -807,7 +1290,7 @@ secs.forEach(s => new IntersectionObserver(entries => {
     const c = document.getElementById('pipe-viz'); c.innerHTML='';
     const s = STEPS[step];
     const panels = document.createElement('div'); panels.className = 'pipe-panels';
-    [['① Nested',s.nested],['② Step-by-step',s.step],['③ Pipe form',s.pipe]].forEach(([lbl,code])=>{
+    [['① Step-by-step',s.step],['② Pipe form',s.pipe]].forEach(([lbl,code])=>{
       const p=document.createElement('div'); p.className='pipe-panel'+(s.hl?' hl':'');
       const l=document.createElement('div'); l.className='pipe-panel-lbl'; l.textContent=lbl;
       const cd=document.createElement('div'); cd.className='pipe-code'; cd.innerHTML=enc(code);
@@ -836,10 +1319,10 @@ secs.forEach(s => new IntersectionObserver(entries => {
   const fitX=[0,2000], fitY=fitX.map(x=>slope*x+intercept);
 
   const LAYERS = [
-    { id:'base',   locked:true,  active:true,  label:`<span class="lkw">ggplot</span>(data, <span class="lkw">aes</span>(x=concentration, y=absorbance))`, code:`ggplot(df, aes(x = concentration, y = absorbance))` },
-    { id:'point',  locked:false, active:true,  label:`<span class="lfn">geom_point</span>(colour=<span class="lstr">"#1A5276"</span>, size=<span class="lnum">3</span>)`, code:`  geom_point(colour = "#1A5276", size = 3)` },
-    { id:'smooth', locked:false, active:false, label:`<span class="lfn">geom_smooth</span>(method=<span class="lstr">"lm"</span>, colour=<span class="lstr">"#148F77"</span>)`, code:`  geom_smooth(method = "lm", colour = "#148F77")` },
-    { id:'labs',   locked:false, active:false, label:`<span class="lfn">labs</span>(title=<span class="lstr">"BCA Standard Curve"</span>, x=<span class="lstr">"Conc."</span>, y=<span class="lstr">"Abs."</span>)`, code:`  labs(title = "BCA Standard Curve",\n       x = "Concentration (µg/mL)", y = "Absorbance")` },
+    { id:'base',   locked:true,  active:true,  label:`<span class="lkw">ggplot</span>(data = bsa_table, <span class="lkw">aes</span>(x = absorbance, y = concentration))`, code:`ggplot(data = bsa_table, mapping = aes(x = absorbance, y = concentration))` },
+    { id:'point',  locked:false, active:true,  label:`<span class="lfn">geom_point</span>(alpha = <span class="lnum">0.5</span>, color = <span class="lstr">"red"</span>)`, code:`  geom_point(alpha = 0.5, color = "red")` },
+    { id:'smooth', locked:false, active:false, label:`<span class="lfn">geom_smooth</span>(method = <span class="lstr">"lm"</span>)`, code:`  geom_smooth(method = 'lm')` },
+    { id:'labs',   locked:false, active:false, label:`<span class="lfn">labs</span>(title=<span class="lstr">"BCA Standard Curve"</span>, x=<span class="lstr">"Absorbance"</span>, y=<span class="lstr">"Concentration (µg/mL)"</span>)`, code:`  labs(title = "BCA Standard Curve",\n       x = "Absorbance", y = "Concentration (µg/mL)")` },
     { id:'theme',  locked:false, active:false, label:`<span class="lfn">theme_minimal</span>()`, code:`  theme_minimal()` },
   ];
 
@@ -859,8 +1342,8 @@ secs.forEach(s => new IntersectionObserver(entries => {
     const minimal    = LAYERS.find(l=>l.id==='theme').active;
 
     const datasets = [];
-    if (showPoint) datasets.push({ label:'Data', data:conc.map((x,i)=>({x,y:abs[i]})), type:'scatter', backgroundColor:'#1A5276', pointRadius:6, pointHoverRadius:8 });
-    if (showSmooth) datasets.push({ label:'lm fit', data:fitX.map((x,i)=>({x,y:fitY[i]})), type:'line', borderColor:'#148F77', backgroundColor:'rgba(20,143,119,0.15)', borderWidth:2, pointRadius:0, fill:true });
+    if (showPoint) datasets.push({ label:'Data', data:abs.map((a,i)=>({x:a,y:conc[i]})), type:'scatter', backgroundColor:'rgba(200,50,50,0.5)', pointRadius:6, pointHoverRadius:8 });
+    if (showSmooth) datasets.push({ label:'lm fit', data:fitX.map((x,i)=>({x:fitY[i],y:fitX[i]})), type:'line', borderColor:'#148F77', backgroundColor:'rgba(20,143,119,0.15)', borderWidth:2, pointRadius:0, fill:true });
 
     if (chart) {
       chart.data.datasets = datasets;
@@ -877,8 +1360,8 @@ secs.forEach(s => new IntersectionObserver(entries => {
           responsive:true,
           plugins:{ legend:{display:false}, title:{display:showTitle,text:showTitle?'BCA Standard Curve':'',font:{size:14}} },
           scales:{
-            x:{ title:{display:true,text:'Concentration (µg/mL)'}, grid:{display:!minimal} },
-            y:{ title:{display:true,text:'Absorbance'}, grid:{display:!minimal} }
+            x:{ title:{display:true,text:'Absorbance'}, grid:{display:!minimal} },
+            y:{ title:{display:true,text:'Concentration (µg/mL)'}, grid:{display:!minimal} }
           }
         }
       });
@@ -918,10 +1401,10 @@ secs.forEach(s => new IntersectionObserver(entries => {
   new Chart(document.getElementById('scatter-chart'),{
     type:'scatter',
     data:{ datasets:[
-      { label:'Measured', data:conc.map((x,i)=>({x,y:abs[i]})), backgroundColor:'#1A5276', pointRadius:7 },
-      { label:'lm fit', data:[{x:0,y:intercept},{x:2000,y:slope*2000+intercept}], type:'line', borderColor:'#148F77', borderWidth:2, pointRadius:0, backgroundColor:'rgba(20,143,119,0.1)', fill:true },
+      { label:'Measured', data:abs.map((a,i)=>({x:a,y:conc[i]})), backgroundColor:'rgba(200,50,50,0.5)', pointRadius:7 },
+      { label:'lm fit', data:[{x:intercept,y:0},{x:slope*2000+intercept,y:2000}], type:'line', borderColor:'#148F77', borderWidth:2, pointRadius:0, backgroundColor:'rgba(20,143,119,0.1)', fill:true },
     ]},
-    options:{ responsive:true, plugins:{ title:{display:true,text:'BCA Standard Curve',font:{size:14}}, legend:{position:'top'} }, scales:{ x:{title:{display:true,text:'Concentration (µg/mL)'}}, y:{title:{display:true,text:'Absorbance'}} } }
+    options:{ responsive:true, plugins:{ title:{display:true,text:'BCA Standard Curve',font:{size:14}}, legend:{position:'top'} }, scales:{ x:{title:{display:true,text:'Absorbance'}}, y:{title:{display:true,text:'Concentration (µg/mL)'}} } }
   });
 })();
 
